@@ -1,0 +1,14 @@
+x = db.students.aggregate([
+  { "$unwind":"$scores" },
+  {"$match":{
+    "scores.type":"homework"
+  }},
+  { 
+    "$group":{
+       "_id":"$_id",
+       "minscore":{"$min":"$scores.score" }}
+    }
+]);
+
+x.forEach(function(doc) {db.students.update( { "_id": doc._id },                         { "$pull": { "scores" : {
+               "score":doc.minscore,"type":"homework" } } }); });
